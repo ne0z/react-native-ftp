@@ -15,8 +15,7 @@ public class RNFtpPackage implements ReactPackage {
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
       return Arrays.<NativeModule>asList(new RNFtpModule(reactContext));
     }
-
-    @Override
+    
     public List<Class<? extends JavaScriptModule>> createJSModules() {
       return Collections.emptyList();
     }

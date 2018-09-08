@@ -28,6 +28,7 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
+*.vscode
 project.xcworkspace
       
 
