@@ -129,6 +129,21 @@ public class RNFtpModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
+  public void renameFile(final String path, final String newPath, final Promise promise){
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          client.rename(path, newPath);
+          promise.resolve(true);
+        } catch (IOException e) {
+          promise.reject("ERROR",e.getMessage());
+        }
+      }
+    }).start();
+  }
+
+  @ReactMethod
   public void changeDirectory(final String path, final Promise promise){
     new Thread(new Runnable() {
       @Override
