@@ -49,8 +49,12 @@ public class RNFtpModule extends ReactContextBaseJavaModule {
         try {
           client.connect(RNFtpModule.this.ip_address,RNFtpModule.this.port);
           client.enterLocalPassiveMode();
-          client.login(username, password);
-          promise.resolve(true);
+          boolean isLogin = client.login(username, password);
+          if(isLogin){
+            promise.resolve(true);
+          }else{
+            promise.reject("FAILED", "Unable to login to the server.");
+          }
         } catch (Exception e) {
           promise.reject("ERROR",e.getMessage());
         }
