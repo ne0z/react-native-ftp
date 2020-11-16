@@ -49,8 +49,12 @@ public class RNFtpModule extends ReactContextBaseJavaModule {
         try {
           client.connect(RNFtpModule.this.ip_address,RNFtpModule.this.port);
           client.enterLocalPassiveMode();
-          client.login(username, password);
-          promise.resolve(true);
+          boolean isLogin = client.login(username, password);
+          if(isLogin){
+            promise.resolve(true);
+          }else{
+            promise.reject("FAILED", "Unable to login to the server.");
+          }
         } catch (Exception e) {
           promise.reject("ERROR",e.getMessage());
         }
@@ -129,6 +133,26 @@ public class RNFtpModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
+  public void renameFile(final String path, final String newPath, final Promise promise){
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          boolean done = client.rename(path, newPath);
+          if (done) {
+            promise.resolve(true);
+          }else{
+            promise.reject("FAILED", "Unable to rename " + path);
+          }
+          promise.resolve(true);
+        } catch (IOException e) {
+          promise.reject("ERROR",e.getMessage());
+        }
+      }
+    }).start();
+  }
+
+  @ReactMethod
   public void changeDirectory(final String path, final Promise promise){
     new Thread(new Runnable() {
       @Override
@@ -162,7 +186,7 @@ public class RNFtpModule extends ReactContextBaseJavaModule {
 
 
   @ReactMethod
-  public void uploadFile(final String path,final String remoteDestinationDir, final Promise promise){
+  public void uploadFile(final String path, final String fileName, final String remoteDestinationDir, final Promise promise){
     new Thread(new Runnable() {
       @Override
       public void run() {
@@ -171,10 +195,11 @@ public class RNFtpModule extends ReactContextBaseJavaModule {
           File firstLocalFile = new File(path);
 
           String firstRemoteFile = remoteDestinationDir+"/"+firstLocalFile.getName();
+          String firstRemoteFileName = fileName != null ? fileName : firstRemoteFile;
           InputStream inputStream = new FileInputStream(firstLocalFile);
 
           System.out.println("Start uploading first file");
-          boolean done = client.storeFile(firstRemoteFile, inputStream);
+          boolean done = client.storeFile(firstRemoteFileName, inputStream);
           inputStream.close();
           if (done) {
             promise.resolve(true);
