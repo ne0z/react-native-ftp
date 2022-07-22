@@ -1,0 +1,34 @@
+name: npm audit
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  audit:
+    name: Audit packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Audit packages
+        run: npm audit --audit-level moderate
+        env:
+          CI: true
+
+  analyze:
+      name: Analyze
+      runs-on: ubuntu-latest
+      permissions:
+        actions: read
+        contents: read
+        security-events: write
+      steps:
+        - uses: actions/checkout@v3
+        - name: Initialize CodeQL
+          uses: github/codeql-action/init@v2
+          with:
+            languages: javascript
+        - name: Perform CodeQL Analysis
+          uses: github/codeql-action/analyze@v2
